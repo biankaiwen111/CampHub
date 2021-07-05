@@ -3,7 +3,6 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const express = require("express");
-const app = express();
 const path = require("path");
 const mongoose = require("mongoose");
 const ejsMate = require("ejs-mate");
@@ -14,14 +13,13 @@ const methodOverride = require("method-override");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user");
-const mongoSanitize = require("express-mongo-sanitize");
 const helmet = require("helmet");
-
-const usersRoutes = require("./routes/users");
+const mongoSanitize = require("express-mongo-sanitize");
+const userRoutes = require("./routes/users");
 const campgroundRoutes = require("./routes/campgrounds");
 const reviewRoutes = require("./routes/reviews");
 
-const MongoStore = require("connect-mongo");
+//const MongoDBStore = require("connect-mongo")(session);
 
 const dbUrl = process.env.DB_URL || "mongodb://localhost:27017/yelp-camp";
 
@@ -37,6 +35,8 @@ db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", () => {
   console.log("Database connected");
 });
+
+const app = express();
 
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
