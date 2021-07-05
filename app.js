@@ -3,6 +3,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const express = require("express");
+const app = express();
 const path = require("path");
 const mongoose = require("mongoose");
 const ejsMate = require("ejs-mate");
@@ -36,8 +37,6 @@ db.once("open", () => {
   console.log("Database connected");
 });
 
-const app = express();
-
 app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -48,20 +47,22 @@ app.use(express.static(path.join(__dirname, "public")));
 
 const secret = process.env.SECRET || "thisshouldbeabettersecret!";
 
-// const store = new MongoDBStore({
-//   url: dbUrl,
-//   secret,
-//   touchAfter: 24 * 60 * 60,
-// });
+const store = MongoStore.create({
+  mongoUrl: dbUrl,
+  crypto: {
+    secret: secret,
+  },
+  touchAfter: 24 * 60 * 60,
+});
 
-// store.on("error", function (e) {
-//   console.log("SESSION STORE ERROR", e);
-// });
+store.on("error", function (e) {
+  console.log("STORE ERROR!", e);
+});
 
 const sessionConfig = {
-  //store,
+  store,
   name: "session",
-  secret,
+  secret: secret,
   resave: false,
   saveUninitialized: true,
   cookie: {
